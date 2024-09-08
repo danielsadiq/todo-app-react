@@ -5,10 +5,10 @@ import logoCross from "./images/icon-cross.svg";
 import logoCheck from "./images/icon-check.svg";
 
 const beforeItems = [
-    { name: "Jog", checked: false },
-    { name: "10 mins meditation", checked: false },
-    { name: "Read for 1 hour", checked: false },
-    { name: "Pick up groceries", checked: false },
+    { name: "Jog", checked: false, id:101 },
+    { name: "10 mins meditation", checked: false, id:102 },
+    { name: "Read for 1 hour", checked: false, id:103 },
+    { name: "Pick up groceries", checked: false, id:104 },
 ];
 
 export default function App() {
@@ -53,7 +53,7 @@ function InputBox({ setItems }) {
     function handleSubmit(e) {
         e.preventDefault();
         console.log(todo);
-        setItems((items) => [...items, { name: todo, checked: false }]);
+        setItems((items) => [...items, { name: todo, checked: false, id:Date.now() }]);
         setTodo("");
     }
 
@@ -76,7 +76,7 @@ function Box({ items, setItems }) {
         <div className="box">
             <ul className="items-list">
                 {items.map((x) => (
-                    <Item item={x} key={x.name} setItems={setItems} />
+                    <Item item={x} key={x.id} setItems={setItems} />
                 ))}
             </ul>
         </div>
@@ -87,14 +87,14 @@ function Item({ item, setItems }) {
     const [checked, setChecked] = useState(false);
 
     function deleteItem() {
-        setItems((items) => items.filter((each) => each.name !== item.name));
+        setItems((items) => items.filter((each) => each.id !== item.id));
     };
 
     function onCheck() {
         setItems((items) =>
             items.map((x) =>
-                x.name === item.name ? 
-					{ name: item.name, checked: !checked } : x
+                x.id === item.id ? 
+					{ name: item.name, checked: !checked, id:item.id } : x
             )
         );
         setChecked(!checked);
@@ -119,27 +119,29 @@ function Item({ item, setItems }) {
     );
 }
 
-function Footer({ items, setItems, setSortedItems }) {
+function Footer({ items, setItems }) {
 	const [sortBy, setSortyBy] = useState("All");
-	if (sortBy === "All"){
 
-	}
-	if (sortBy === "Complete"){
-		let sorted = items.slice().sort((a,b) => Number(a.checked)-Number(b.checked))
-		console.log(sorted);
-		
-	}
+    function handleChooseOption(e){
+        // setSortyBy(val);
+        let val = e.target.innerText;
+        if (val === "All") setItems(items => items.slice().sort((a,b) => Number(a.id) - Number(b.id)));
+        if (val === "Complete") setItems(items => items.slice().sort((a,b) => Number(a.checked) - Number(b.checked)));
+        setSortyBy(val)
+    }
 
+    
     function clearComplete() {
         setItems((items) => items.filter((item) => item.checked === false));
     }
+
     return (
         <div className="footer-box">
             <p>{items.length} items left</p>
             <div className="footer-list">
-                <p className={`footer-option${sortBy==="All" ? " active-option": ""}`} onClick={() =>setSortyBy("All")}>All</p>
-                <p className={`footer-option${sortBy==="Active" ? " active-option": ""}`} onClick={() =>setSortyBy("Active")}>Active</p>
-                <p className={`footer-option${sortBy==="Complete" ? " active-option": ""}`} onClick={() =>setSortyBy("Complete")}>Complete</p>
+                <p className={`footer-option${sortBy==="All" ? " active-option": ""}`}  onClick={handleChooseOption}>All</p>
+                <p className={`footer-option${sortBy==="Active" ? " active-option": ""}`} onClick={handleChooseOption}>Active</p>
+                <p className={`footer-option${sortBy==="Complete" ? " active-option": ""}`} onClick={handleChooseOption}>Complete</p>
             </div>
             <p className="footer-option" onClick={clearComplete}>
                 Clear completed
@@ -147,3 +149,8 @@ function Footer({ items, setItems, setSortedItems }) {
         </div>
     );
 }
+
+
+// <p className={`footer-option${sortBy==="All" ? " active-option": ""}`} >All</p>
+// <p className={`footer-option${sortBy==="Active" ? " active-option": ""}`} onClick={setItems(sorted)}>Active</p>
+// <p className={`footer-option${sortBy==="Complete" ? " active-option": ""}`} >Complete</p>
